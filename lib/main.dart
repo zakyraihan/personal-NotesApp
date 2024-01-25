@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mynotes/home.dart';
+import 'package:mynotes/ui/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +18,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: false,
       ),
       home: const HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/home': (context) => const HomePage(),
+      },
     );
   }
 }

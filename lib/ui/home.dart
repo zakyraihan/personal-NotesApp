@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/db/db_helper.dart';
 import 'package:mynotes/model/model.dart';
+import 'package:mynotes/ui/detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,14 +15,12 @@ class _HomePageState extends State<HomePage> {
 
   List<Map<String, dynamic>> _data = [];
 
-  bool _isLoading = true;
   bool isOpen = false;
 
   void _getData() async {
     final data = await SqlHelper.getAllNotes();
     setState(() {
       _data = data;
-      _isLoading = false;
     });
   }
 
@@ -107,38 +106,45 @@ class _HomePageState extends State<HomePage> {
           const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
       itemBuilder: (context, index) {
         final data = _data[index];
-        return Card(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        data['description'],
-                      ),
-                    ],
+        return GestureDetector(
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailPage(data: data),
+              )),
+          child: Card(
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          data['description'],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      _deleteData(data['id']);
-                      _getData();
-                    },
-                    icon: const Icon(Icons.delete, size: 20),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.edit, size: 20),
-                  ),
-                ],
-              ),
-            ],
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        _deleteData(data['id']);
+                        _getData();
+                      },
+                      icon: const Icon(Icons.delete, size: 20),
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.edit, size: 20),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
