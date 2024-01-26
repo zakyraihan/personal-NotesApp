@@ -28,8 +28,9 @@ class _HomePageState extends State<HomePage> {
     await SqlHelper.deleteNotes(id);
   }
 
-  Future<void> createData(NotesResult data) async {
-    await SqlHelper.createNotes(data);
+  Future<void> createData() async {
+    await SqlHelper.createNotes(
+        NotesResult(description: descriptionController.text));
     descriptionController.clear();
     _getData();
   }
@@ -38,6 +39,50 @@ class _HomePageState extends State<HomePage> {
     await SqlHelper.updateNotes(data, id);
 
     _getData();
+  }
+
+  Future<void> updateNotes(int id) async {
+    Navigator.pop(context);
+    await SqlHelper.updateNotes(
+      NotesResult(description: descriptionController.text),
+      id,
+    );
+    _getData();
+  }
+
+  showBottomUpdate(int? id) {
+    if (id != null) {
+      final existingData = _data.firstWhere((element) => element['id'] == id);
+      descriptionController.text = existingData['description'];
+    }
+
+    AlertDialog alertDialog = AlertDialog(
+      content: SizedBox(
+        height: 200,
+        child: Column(
+          children: [
+            TextField(
+              controller: descriptionController,
+              maxLines: 5,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () async {
+            if (id != null) {
+              await updateNotes(id);
+            }
+            if (id == null) {
+              await createData();
+            }
+          },
+          child: const Text('Save'),
+        ),
+      ],
+    );
+    return showDialog(context: context, builder: (context) => alertDialog);
   }
 
   @override
@@ -64,9 +109,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                await createData(
-                  NotesResult(description: descriptionController.text),
-                );
+                await createData();
                 setState(() {
                   isOpen = false;
                 });
@@ -138,7 +181,9 @@ class _HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.delete, size: 20),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showBottomUpdate(data['id']);
+                      },
                       icon: const Icon(Icons.edit, size: 20),
                     ),
                   ],
